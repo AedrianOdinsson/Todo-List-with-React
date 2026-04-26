@@ -1,11 +1,15 @@
-/* 
+.tarea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+}
 
-    You can write your own styles here...
-    
-    
-    ...Or you can use the import command to include 
-    other sylesheets into your bunde as well, e.j:
-    
-    import 'relative/path/to/stylesheet.scss';
+.delete-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 
-*/
+.tarea:hover .delete-btn {
+  opacity: 1;
+}

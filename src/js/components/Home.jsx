@@ -4,25 +4,53 @@ import React from "react";
 import rigoImage from "../../img/rigo-baby.jpg";
 
 //create your first component
-const Home = () => {
+import { useState } from "react";
+const TodoList = () => {
+
+	const [tareas, setTareas] = useState([])
+	const [inputText, setInputText] = useState("");
+	const borrarTarea = (id) => {
+		setTareas(tareas.filter((tarea) => tarea.id !== id));
+	};
+
+	const agregarTarea = () => {
+		const nuevaTarea = {
+			id: Date.now(),
+			texto: inputText,
+			done: false
+		};
+		setTareas([...tareas, nuevaTarea]);
+		setInputText("");
+	};
+
 	return (
-		<div className="text-center">
-            
+		<div>
+			<input
+				value={inputText}
+				onChange={(event) => setInputText(event.target.value)}
+				onKeyDown={(event) => {
+					if (event.key === "Enter") {
+						agregarTarea();
+					}
+				}}
+			/>
 
-			<h1 className="text-center mt-5">Hello Rigo!</h1>
-			<p>
-				<img src={rigoImage} />
-			</p>
-			<a href="#" className="btn btn-success">
-				If you see this green button... bootstrap is working...
-			</a>
-			<p>
-				Made by{" "}
-				<a href="http://www.4geeksacademy.com">4Geeks Academy</a>, with
-				love!
-			</p>
+			<button onClick={agregarTarea}>Add</button>
+
+			{tareas.length === 0 && <p>No hay tareas, añadir tareas</p>}
+
+			{tareas.map((tarea) => {
+				return (
+					<div key={tarea.id} className="tarea">
+						{tarea.texto}
+						<button className="delete-btn" onClick={() => borrarTarea(tarea.id)}>❌</button>
+					</div>
+
+				);
+			})}
+
 		</div>
-	);
-};
+	)
+}
 
-export default Home;
+export default TodoList;
