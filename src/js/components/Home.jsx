@@ -16,19 +16,76 @@ const TodoList = () => {
 		}
 	}, [user]);
 
-	const borrarTarea = (id) => {
-		setTareas(tareas.filter((tarea) => tarea.id !== id));
+	useEffect(() => {
+		if (!user) return;
+
+		const cargarTareas = async () => {
+			try {
+				const response = await fetch(`https://playground.4geeks.com/todo/users/${user}`);
+				const data = await response.json();
+
+				if (data.todos) {
+					setTareas(data.todos);
+				}
+			} catch (error) {
+				console.error("Error cargando tareas:", error);
+			}
+		};
+
+		cargarTareas();
+	}, [user]);
+
+	const borrarTarea = async (id) => {
+		try {
+			await fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
+				method: "DELETE"
+			});
+
+			// Quitamos la tarea del estado
+			setTareas(tareas.filter((tarea) => tarea.id !== id));
+
+		} catch (error) {
+			console.error("Error borrando tarea:", error);
+		}
 	};
+
 
 	const agregarTarea = async () => {
 		if (inputText.trim() === "") return;
 
-		const nuevaTarea = {
-			label: inputText,
-			is_done: false
-		};
-		setTareas([...tareas, nuevaTarea]);
-		setInputText("");
+		try {
+			const response = await fetch(`https://playground.4geeks.com/todo/todos/${user}`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					label: inputText,
+					is_done: false
+				})
+			});
+
+			const nuevaTarea = await response.json();
+			setTareas([...tareas, nuevaTarea]);
+			setInputText("");
+
+		} catch (error) {
+			console.error("Error agregando tarea:", error);
+		}
+	};
+
+
+	const postUser = async (username) => {
+		try {
+			const response = await fetch(`https://playground.4geeks.com/todo/users/${username}`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" }
+			});
+
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			console.error("Error creando usuario:", error);
+			return null;
+		}
 	};
 
 
@@ -44,8 +101,20 @@ const TodoList = () => {
 							value={userInput}
 							onChange={(e) => setUserInput(e.target.value)}
 						/>
+						<button
+							onClick={async () => {
+								const data = await postUser(userInput);
 
-						<button>Crear Usuario</button>
+								if (data) {
+									localStorage.setItem("todoUser", userInput);
+									setUser(userInput);
+									setMostrarModal(false);
+								}
+							}}
+						>
+							Crear Usuario
+						</button>
+
 					</div>
 				</div>
 			}
@@ -78,12 +147,11 @@ const TodoList = () => {
 }
 
 const Home = () => {
-
 	const [list, setList] = useState([])
 
 	async function Todo() {
-		let result = await fetch("https://playground.4geeks.com/todo/users/%C3%81drianSS") // Lo lee -> Pending...
-		let data = await result.json()  // Usar await - Abrir contenido
+		let result = await fetch("https://playground.4geeks.com/todo/users/ÁdrianSS")
+		let data = await result.json()
 
 		setList(data.results)
 
