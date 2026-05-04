@@ -23,7 +23,7 @@ const TodoList = () => {
 			try {
 				const response = await fetch(`https://playground.4geeks.com/todo/users/${user}`);
 				const data = await response.json();
-
+				console.log("GET tareas -> respuesta API" , data);
 				if (data.todos) {
 					setTareas(data.todos);
 				}
@@ -54,7 +54,7 @@ const TodoList = () => {
 		if (inputText.trim() === "") return;
 
 		try {
-			const response = await fetch(`https://playground.4geeks.com/todo/todos/${user}`, {
+			const response = await fetch(`https://playground.4geeks.com/todo/todos/${encodeURIComponent(user)}`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -64,6 +64,7 @@ const TodoList = () => {
 			});
 
 			const nuevaTarea = await response.json();
+
 			setTareas([...tareas, nuevaTarea]);
 			setInputText("");
 
@@ -129,6 +130,18 @@ const TodoList = () => {
 			/>
 
 			<button onClick={agregarTarea}>Add</button>
+
+			<button
+				onClick={() => {
+					localStorage.removeItem("todoUser");
+					setUser(null);
+					setTareas([]);
+					setMostrarModal(true);
+				}}
+			>
+				Cambiar usuario
+			</button>
+
 
 			{tareas.length === 0 && <p>No hay tareas, añadir tareas</p>}
 
